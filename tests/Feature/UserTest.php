@@ -20,6 +20,7 @@ class UserTest extends TestCase
 
         $this
             ->postJson('/register', $data)
+            ->dump()
             ->assertRedirect('/login');
     }
     public function test_login_user()
@@ -34,6 +35,7 @@ class UserTest extends TestCase
 
 
       $this->postJson('/login',['email'=> $user->email,'password' => $password])
+          ->dump()
           ->assertRedirect('/');
     }
 }

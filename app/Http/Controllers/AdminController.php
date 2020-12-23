@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\AdminLoginFormRequest as RegisterFormRequest;
 class AdminController extends Controller
 {
     public function __construct()
@@ -12,17 +13,12 @@ class AdminController extends Controller
         $this->middleware('guest:admin');
     }
 
-    public function loginAdmin(Request $request){
-        $request->validate(
-            [
-                'email' => 'required|email',
-                'password' => 'required'
-            ]
-        );
-        $data = ['email' => $request->email,'password' => $request->password];
+    public function loginAdmin(RegisterFormRequest $registerFormRequest){
+
+        $data = ['email' => $registerFormRequest->email,'password' => $registerFormRequest->password];
         If(Auth::guard('admin')->attempt($data)){
             return redirect()->intended('admin');
         }
-        return redirect()->back()->withInput($request->only(['email','password']));
+        return redirect()->back()->withInput($registerFormRequest->only(['email','password']));
     }
 }

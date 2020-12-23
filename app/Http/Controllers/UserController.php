@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Http\Requests\UserRegisterFormRequest as RegisterFormRequest;
+use App\Http\Requests\UserLoginFormRequest as LoginFormRequest;
 class UserController extends Controller
 {
     public function __construct()
@@ -15,33 +17,23 @@ class UserController extends Controller
         $this->middleware('guest');
     }
 
-    public function register(Request $request)
+    public function register(RegisterFormRequest $registerFormRequest)
     {
-        $attrs = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
         $user = User::create([
-            'name' => $attrs['name'],
-            'email' => $attrs['email'],
-            'password' => Hash::make($attrs['password']),
+            'name' => $registerFormRequest['name'],
+            'email' => $registerFormRequest['email'],
+            'password' => Hash::make($registerFormRequest['password']),
         ]);
 
         return redirect()->intended('/login');
     }
 
-    public function login(Request $request)
+    public function login(LoginFormRequest $loginFormRequest)
     {
-        $attrs = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
+        $attrs = ['email' => $loginFormRequest->email, 'password' => $loginFormRequest->password];
         if(Auth::attempt($attrs)){
             return redirect()->intended('/');
         }
-        return redirect()->back()->withInput($attrs);
+        return redirect()->back()->withInput($loginFormRequest->only('email','password'));
     }
 }
